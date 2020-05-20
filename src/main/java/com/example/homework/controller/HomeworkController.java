@@ -22,8 +22,11 @@ public class HomeworkController {
     // Swagger를 통해 Test 및 UI 를 통해 요청을 한다 (이렇게 안하면 피들러나 포스트맨이 필요)
     @ApiOperation(value = "naver 도서 검색", notes = "책 기본 검색")
     @GetMapping("")
-    public ResponseEntity<BookResponse> naverApi(@ApiParam(value = "", required = false, example = "") @ModelAttribute BookRequest req) throws Exception {
-        System.out.println(req.toString());
+    public ResponseEntity<BookResponse> naverApi(
+            @ApiParam(value = "", required = false, example = "")
+            @ModelAttribute BookRequest req)
+            throws Exception {
+
         ResponseEntity<BookResponse> response = naverService.searchBook(req);
         return response;
     }

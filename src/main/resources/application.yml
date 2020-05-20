@@ -1,0 +1,26 @@
+spring:
+  profiles:
+    active: local # 기본 환경 선택
+
+# local 환경
+---
+spring:
+  profiles: local
+server:
+  port: 8081
+logging:
+  level:
+    root: info
+api:
+  naver:
+    clientId: e8h7wbC8gB79115kRulB
+    clientSecret: di_bU_MKD4
+    search:
+      book: https://openapi.naver.com/v1/search/book.json
+
+# 운영 환경
+---
+spring:
+  profiles: productuon
+server:
+  port: 8080
