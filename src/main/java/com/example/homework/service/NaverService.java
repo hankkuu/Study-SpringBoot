@@ -1,10 +1,11 @@
 package com.example.homework.service;
 
 import com.example.homework.common.ApiException;
-import com.example.homework.config.RestTemplateConfig;
 import com.example.homework.model.request.BookRequest;
 import com.example.homework.model.response.BookResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -29,14 +30,20 @@ public class NaverService {
     @Value("${api.naver.search.book}")
     private String bookSearchApi;
 
-    private final RestTemplateConfig restTemplateConfig;
+    @Autowired
+    @Qualifier("rest")
     private RestTemplate restTemplate;
     private HttpEntity entity;
 
-    public NaverService(RestTemplateConfig restTemplateConfig) {
-        this.restTemplateConfig = restTemplateConfig;
-        this.restTemplate = restTemplateConfig.restTemplate();
-        createHttpHeader();
+    public RestTemplate rest() {
+        return this.restTemplate;
+    }
+
+    public NaverService(RestTemplate template) {
+        // Autowired 안쓰고 생성자 주입하면 name으로 가져오지 않는다..
+        //this.restTemplate = template;
+        // 생성자에서 셋팅할 경우 설정값을 yml에서 바로 가져오지 못한다...
+        //createHttpHeader();
     }
 
     private void createHttpHeader() {
@@ -49,6 +56,7 @@ public class NaverService {
 
     public ResponseEntity<BookResponse> searchBook(BookRequest req) throws ApiException {
         log.info(req.toString());
+        createHttpHeader();
         String url = this.bookSearchApi; // 설정에서 가져오면 좋겠다
         // 인코딩 방법 1
         //headers.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
@@ -62,16 +70,11 @@ public class NaverService {
         builder.queryParam("sort", req.getSort());
         UriComponents endUri =  builder.build().encode(StandardCharsets.UTF_8);
         URI uri = endUri.toUri();
-        log.info(uri.getHost());
-        log.info(uri.getPath());
-        log.info(uri.getQuery());
-
-        // test
-        //url = url + "?" + "query=" + "팩트풀니스";
 
         // 객체로 응답을 받아 결과 를 보여준다
         ResponseEntity<BookResponse> response = this.restTemplate.exchange(uri, HttpMethod.GET, this.entity, BookResponse.class);
         log.info(response.getStatusCode().toString());
+        //log.info(response.toString());
 
         if(response.getStatusCodeValue() != 200) {
             throw new ApiException("fail to call rest template", "10000", "error!!!");

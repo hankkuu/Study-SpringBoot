@@ -2,7 +2,6 @@ package com.example.homework.config;
 
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
@@ -15,7 +14,7 @@ public class RestTemplateConfig {
     private RestTemplate template = new RestTemplate();
 
     // @Bean 으로 설정시 자동 Singleton이 되는지 반복해서 호출해도 계속 호출되지 않음
-    @Bean
+    @Bean(name = "rest")
     public RestTemplate restTemplate() {
         // connection pool 적용 언젠가 만날 것 같아서 기록..
         // RestTemplate 은 기본적으로 connection pool 을 사용하지 않는다. 따라서 연결할 때 마다, 로컬 포트를 열고 tcp connection 을 맺는다.
