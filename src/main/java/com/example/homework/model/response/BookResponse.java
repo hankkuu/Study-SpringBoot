@@ -23,30 +23,31 @@ public class BookResponse {
     int display;
     @JsonProperty
     List<Book> items;
+
+    @Getter
+    @Setter
+    @ToString
+    static class Book {
+        @JsonProperty
+        public String title;
+        @JsonProperty
+        public String link;
+        @JsonProperty
+        public String image;
+        @JsonProperty
+        public String author;
+        @JsonProperty
+        public String price;
+        @JsonProperty
+        public String discount;
+        @JsonProperty
+        public String publisher;
+        @JsonProperty
+        public String pubdate;
+        @JsonProperty
+        public String isbn;
+        @JsonProperty
+        public String description;
+    }
 }
 
-@Getter
-@Setter
-@ToString
-class Book {
-    @JsonProperty
-    public String title;
-    @JsonProperty
-    public String link;
-    @JsonProperty
-    public String image;
-    @JsonProperty
-    public String author;
-    @JsonProperty
-    public String price;
-    @JsonProperty
-    public String discount;
-    @JsonProperty
-    public String publisher;
-    @JsonProperty
-    public String pubdate;
-    @JsonProperty
-    public String isbn;
-    @JsonProperty
-    public String description;
-}

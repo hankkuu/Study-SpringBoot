@@ -46,7 +46,7 @@ public class SwaggerConfig {
                 .groupName(version)
                 .select()
                 .apis(RequestHandlerSelectors.basePackage("com.example.homework"))
-                .paths(PathSelectors.ant("/naverApi"))
+                .paths(PathSelectors.ant("/naverApi/**"))
                 .build()
                 .apiInfo(apiInfo(title, version))
                 .globalResponseMessage(RequestMethod.GET, responseMessages);
