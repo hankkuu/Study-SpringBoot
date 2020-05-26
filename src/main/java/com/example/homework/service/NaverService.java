@@ -30,18 +30,14 @@ public class NaverService {
     @Value("${api.naver.search.book}")
     private String bookSearchApi;
 
-    @Autowired
-    @Qualifier("rest")
+    //@Autowired
+    //@Qualifier("rested")
     private RestTemplate restTemplate;
     private HttpEntity entity;
 
-    public RestTemplate rest() {
-        return this.restTemplate;
-    }
-
     public NaverService(RestTemplate template) {
-        // Autowired 안쓰고 생성자 주입하면 name으로 가져오지 않는다..
-        //this.restTemplate = template;
+        // Autowired 안쓰고 생성자 주입하면 name으로 가져오지 않는다.. 동일한 타입의 Bean이 하나라서??
+        this.restTemplate = template;
         // 생성자에서 셋팅할 경우 설정값을 yml에서 바로 가져오지 못한다...
         //createHttpHeader();
     }
