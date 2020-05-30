@@ -14,21 +14,17 @@ package com.example.homework.model.response;
 // actor	        string	검색 결과 영화의 출연 배우이다.
 // userRating	    integer	검색 결과 영화에 대한 유저들의 평점이다.
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.example.homework.common.Response;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import org.springframework.beans.factory.annotation.Autowired;
 
-import java.sql.Date;
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 @Getter
 @Setter
 @ToString
-public class MovieResponse {
+public class MovieResponse extends Response {
 
     String lastBuildDate;
 

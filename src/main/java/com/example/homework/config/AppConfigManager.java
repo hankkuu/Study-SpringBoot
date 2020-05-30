@@ -14,10 +14,19 @@ import java.util.Map;
 public class AppConfigManager {
 
     private NaverApi naverApi = new NaverApi();
+    private KakaoApi kakaoApi = new KakaoApi();
 
     @Getter
     @Setter
     public class NaverApi {
+        private String clientId;
+        private String clientSecret;
+        private Map<String, String> search;
+    }
+
+    @Getter
+    @Setter
+    public class KakaoApi {
         private String clientId;
         private String clientSecret;
         private Map<String, String> search;

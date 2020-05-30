@@ -27,21 +27,20 @@ package com.example.homework.model.request;
 //        yearto	  integer(ex : 2008)	N	-	        검색을 원하는 영화의 제작년도(최대)를 의미한다. yearto는 yearfrom과 함께 사용되어야 한다.
 
 import com.example.homework.common.Query;
+import com.example.homework.common.QueryStringAnnotation;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Pattern;
+import javax.validation.constraints.*;
 
 @Getter
 @Setter
 @ToString
 public class MovieRequest extends Query {
 
-    @NotBlank
+    @NotNull
     private String query;
 
     @Min(10)
@@ -52,12 +51,16 @@ public class MovieRequest extends Query {
     @Max(1000)
     private Integer start = 1;          // 최대 1000
 
+    @Pattern(regexp = "^[0-9]+$", message = "숫자만 가능합니다")
     private String genre;
 
+    @Pattern(regexp = "^[A-Z]+$" ,message = "대문자만 가능합니다")
     private String country;
 
-    //@Pattern(regexp = "^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,6}$")
     private Integer yearfrom;           // (ex : 2000)
 
     private Integer yearto;             // (ex : 2000)
+
+    @QueryStringAnnotation(isIgnore = true)
+    private boolean isIgnoreZeroRating = false;
 }
