@@ -1,6 +1,5 @@
 package com.example.homework.common;
 
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -9,12 +8,18 @@ import lombok.ToString;
 @Setter
 @ToString
 public class ApiResponse extends Response {
+    // HttpStatus
+    private String status;
+    // Http Default Message
+    private String message;
 
     public ApiResponse() {
         super();
     }
 
     public ApiResponse(String status, String message) {
-        super(status, message);
+        super();
+        this.status = status;
+        this.message = message;
     }
 }

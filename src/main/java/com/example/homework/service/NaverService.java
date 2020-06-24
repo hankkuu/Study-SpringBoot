@@ -1,79 +1,92 @@
 package com.example.homework.service;
 
-import com.example.homework.common.ApiException;
+import com.example.homework.common.exception.ApiException;
+import com.example.homework.common.HomeworkRestTemplate;
+import com.example.homework.common.util.Convertor;
+import com.example.homework.config.AppConfigManager;
 import com.example.homework.model.request.BookRequest;
+import com.example.homework.model.request.MovieRequest;
 import com.example.homework.model.response.BookResponse;
+import com.example.homework.model.response.MovieResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
-import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 @Slf4j
 @Service
 public class NaverService {
 
-    @Value("${api.naver.clientId}")
-    private String clientId; //애플리케이션 클라이언트 아이디값"
-    @Value("${api.naver.clientSecret}")
-    private String clientSecret; //애플리케이션 클라이언트 시크릿값"
-    @Value("${api.naver.search.book}")
-    private String bookSearchApi;
-
-    //@Autowired
-    //@Qualifier("rested")
-    private RestTemplate restTemplate;
+    private AppConfigManager config;
+    private HomeworkRestTemplate restTemplate;
     private HttpEntity entity;
 
-    public NaverService(RestTemplate template) {
-        // Autowired 안쓰고 생성자 주입하면 name으로 가져오지 않는다.. 동일한 타입의 Bean이 하나라서??
+    public NaverService(HomeworkRestTemplate template, AppConfigManager config) {
         this.restTemplate = template;
-        // 생성자에서 셋팅할 경우 설정값을 yml에서 바로 가져오지 못한다...
-        //createHttpHeader();
+        this.config = config;
     }
 
+    @Bean
     private void createHttpHeader() {
-        // Header 정보 셋팅
         HttpHeaders headers = new HttpHeaders();
-        headers.add("X-Naver-Client-Id", this.clientId);
-        headers.add("X-Naver-Client-Secret", this.clientSecret);
+        headers.add("X-Naver-Client-Id", config.getNaverApi().getClientId());
+        headers.add("X-Naver-Client-Secret", config.getNaverApi().getClientSecret());
         this.entity = new HttpEntity(headers);
     }
 
-    public ResponseEntity<BookResponse> searchBook(BookRequest req) throws ApiException {
-        log.info(req.toString());
-        createHttpHeader();
-        String url = this.bookSearchApi; // 설정에서 가져오면 좋겠다
-        // 인코딩 방법 1
-        //headers.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
-        // 인코딩 방법 2 (이걸로는 쿼리가 되지 않는다)
-        //String text = URLEncoder.encode("팩트풀니스", "UTF-8");
-        // 인코딩 방법 3
+    private String createQueryString(String url, Object o) throws ApiException {
         UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(url);
-        builder.queryParam("query", req.getQuery());
-        builder.queryParam("display", req.getDisplay());
-        builder.queryParam("start", req.getStart());
-        builder.queryParam("sort", req.getSort());
-        UriComponents endUri =  builder.build().encode(StandardCharsets.UTF_8);
+        Map<String, Object> map = Convertor.converObjectToMap(o);
+        map.forEach((key, value) -> builder.queryParam(key, value.toString()) );
+        UriComponents endUri = builder.build(); //.encode(StandardCharsets.UTF_8); //encoding 안됨
         URI uri = endUri.toUri();
+        return uri.toString();
+    }
 
-        // 객체로 응답을 받아 결과 를 보여준다
-        ResponseEntity<BookResponse> response = this.restTemplate.exchange(uri, HttpMethod.GET, this.entity, BookResponse.class);
-        log.info(response.getStatusCode().toString());
-        //log.info(response.toString());
+    public ResponseEntity<BookResponse> searchBook(BookRequest req) throws ApiException, IllegalAccessException {
+        String uri = config.getNaverApi().getSearch().get("book");
+        uri = this.createQueryString(uri, req);
+        ResponseEntity<BookResponse> response = this.restTemplate.exchange(uri, HttpMethod.GET, this.entity, BookResponse.class, BookResponse.Book.class);
 
-        if(response.getStatusCodeValue() != 200) {
-            throw new ApiException("fail to call rest template", "10000", "error!!!");
+        if (response.getStatusCodeValue() == 200) {
+            throw new ApiException("fail to call rest template - book", 20000, "error!!!");
+        }
+
+        // RestTemplate 에서 구현하지 않고 따로 응답 클래스에서 구현할 경우
+        response.getBody().excludeHtmlTag(response.getBody().getItems());
+
+        if (req.getSortField().isEmpty() == false) {
+            req.sortResponseEntity(response.getBody().getItems());
+        }
+
+        return response;
+    }
+
+    public ResponseEntity<MovieResponse> searchMovie(MovieRequest req) throws ApiException {
+        String uri = config.getNaverApi().getSearch().get("movie");
+        uri = this.createQueryString(uri, req);
+        // RestTemplate 내에서 구현
+        ResponseEntity<MovieResponse> response = this.restTemplate.exchangeExcludeHtmlTag(uri, HttpMethod.GET, this.entity, MovieResponse.class, MovieResponse.Movie.class);
+
+        if (response.getStatusCodeValue() == 200) {
+            throw new ApiException("fail to call rest template - movie", 10000, "error!!!");
+        }
+
+        if(req.isIgnoreZeroRating() == true) {
+            // sort와 달리 범용적으로 쓰는 비즈니스가 아니다.. 이 경우는 서비스에서 직접 구현한다
+            response.getBody().getItems().removeIf(x -> x.getUserRating().doubleValue() == 0.0);
+        }
+
+        if (req.getSortField().isEmpty() == false) {
+            req.sortResponseEntity(response.getBody().getItems());
         }
 
         return response;
