@@ -1,15 +1,11 @@
 package com.example.homework.model.request;
 
-import com.example.homework.common.Query;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.bind.DefaultValue;
-
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
 
 //        요청변수명	타입  필수여부	 기본값	설명	비고
 //        query	    string	-	-	검색을 원하는 문자열로서 UTF-8로 인코딩한다.	상세검색시 생략가능
@@ -27,16 +23,12 @@ import javax.validation.constraints.Min;
 @Getter
 @Setter
 @ToString
-public class BookRequest extends Query {
+public class BookRequest {
 
     private String query = "";
 
-    @Max(100)
-    @Min(10)
     private Integer display = 10;
 
-    @Max(1000)
-    @Min(1)
     private Integer start = 1;
 
     private String sort = "sim";

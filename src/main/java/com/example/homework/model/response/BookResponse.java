@@ -1,6 +1,7 @@
 package com.example.homework.model.response;
 
-import com.example.homework.common.Response;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -10,42 +11,42 @@ import java.util.List;
 @Getter
 @Setter
 @ToString
-public class BookResponse extends Response {
+public class BookResponse {
 
+    @JsonProperty
     String lastBuildDate;
-
+    @JsonProperty
     int total;
-
+    @JsonProperty
     int start;
-
+    @JsonProperty
     int display;
-
+    @JsonProperty
     List<Book> items;
-
-    @Getter
-    @Setter
-    @ToString
-    public static class Book {
-
-        public String title;
-
-        public String link;
-
-        public String image;
-
-        public String author;
-
-        public String price;
-
-        public String discount;
-
-        public String publisher;
-
-        public String pubdate;
-
-        public String isbn;
-
-        public String description;
-    }
 }
 
+@Getter
+@Setter
+@ToString
+class Book {
+    @JsonProperty
+    public String title;
+    @JsonProperty
+    public String link;
+    @JsonProperty
+    public String image;
+    @JsonProperty
+    public String author;
+    @JsonProperty
+    public String price;
+    @JsonProperty
+    public String discount;
+    @JsonProperty
+    public String publisher;
+    @JsonProperty
+    public String pubdate;
+    @JsonProperty
+    public String isbn;
+    @JsonProperty
+    public String description;
+}
